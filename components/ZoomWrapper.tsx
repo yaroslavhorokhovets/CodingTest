@@ -18,89 +18,115 @@ export const ZoomWrapper: React.FC<ZoomWrapperProps> = ({
   const zoomContainerRef = useRef<HTMLDivElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [attendeeCount, setAttendeeCount] = useState(1);
   const { addLog } = useWebinarStore();
 
   useEffect(() => {
     const initializeZoom = async () => {
       try {
-        // Dynamically import Zoom Web SDK
-        const { ZoomMtg } = await import('@zoom/videosdk');
+        // Load Zoom Web SDK script dynamically
+        const script = document.createElement('script');
+        script.src = 'https://source.zoom.us/2.0.0/lib/av/zoom-meeting-2.0.0.min.js';
+        script.async = true;
         
-        // Configure Zoom
-        ZoomMtg.setZoomJSLib('https://source.zoom.us/2.0.0/lib', '/av');
-        ZoomMtg.preLoadWasm();
-        ZoomMtg.prepareWebSDK();
-        ZoomMtg.prepareJssdk();
+        script.onload = () => {
+          // Access ZoomMtg from global window object
+          const ZoomMtg = (window as any).ZoomMtg;
+          
+          if (!ZoomMtg) {
+            setError('Failed to load Zoom SDK');
+            return;
+          }
 
-        // Initialize meeting
-        ZoomMtg.init({
-          leaveUrl: zoomConfig.leaveUrl,
-          isSupportAV: true,
-          success: () => {
-            setIsInitialized(true);
-            addLog({
-              slotId,
-              timestamp: new Date().toISOString(),
-              event: 'attendee_joined',
-              details: 'Zoom session initialized',
-              attendeeCount: 1,
-            });
-          },
-          error: (error: any) => {
-            setError(`Zoom initialization failed: ${error.message}`);
-            addLog({
-              slotId,
-              timestamp: new Date().toISOString(),
-              event: 'admin_action',
-              details: `Zoom initialization error: ${error.message}`,
-            });
-          },
-        });
+          // Configure Zoom
+          ZoomMtg.setZoomJSLib('https://source.zoom.us/2.0.0/lib', '/av');
+          ZoomMtg.preLoadWasm();
+          ZoomMtg.prepareWebSDK();
+          ZoomMtg.prepareJssdk();
 
-        // Join meeting
-        ZoomMtg.join({
-          meetingNumber: zoomConfig.meetingNumber,
-          userName: zoomConfig.userName,
-          userEmail: zoomConfig.userEmail,
-          passWord: zoomConfig.passWord,
-          success: () => {
-            addLog({
-              slotId,
-              timestamp: new Date().toISOString(),
-              event: 'attendee_joined',
-              details: 'Successfully joined Zoom meeting',
-            });
-          },
-          error: (error: any) => {
-            setError(`Failed to join meeting: ${error.message}`);
-          },
-        });
+          // Initialize meeting
+          ZoomMtg.init({
+            leaveUrl: zoomConfig.leaveUrl,
+            isSupportAV: true,
+            success: () => {
+              setIsInitialized(true);
+              addLog({
+                slotId,
+                timestamp: new Date().toISOString(),
+                event: 'attendee_joined',
+                details: 'Zoom session initialized',
+                attendeeCount: 1,
+              });
+            },
+            error: (error: any) => {
+              setError(`Zoom initialization failed: ${error.message || error}`);
+              addLog({
+                slotId,
+                timestamp: new Date().toISOString(),
+                event: 'admin_action',
+                details: `Zoom initialization error: ${error.message || error}`,
+              });
+            },
+          });
 
-        // Start meeting
-        ZoomMtg.startMeeting({
-          meetingNumber: zoomConfig.meetingNumber,
-          userName: zoomConfig.userName,
-          userEmail: zoomConfig.userEmail,
-          passWord: zoomConfig.passWord,
-          success: () => {
-            addLog({
-              slotId,
-              timestamp: new Date().toISOString(),
-              event: 'admin_action',
-              details: 'Zoom meeting started successfully',
-            });
-          },
-          error: (error: any) => {
-            setError(`Failed to start meeting: ${error.message}`);
-          },
-        });
+          // Join meeting
+          ZoomMtg.join({
+            meetingNumber: zoomConfig.meetingNumber,
+            userName: zoomConfig.userName,
+            userEmail: zoomConfig.userEmail,
+            passWord: zoomConfig.passWord,
+            success: () => {
+              addLog({
+                slotId,
+                timestamp: new Date().toISOString(),
+                event: 'attendee_joined',
+                details: 'Successfully joined Zoom meeting',
+              });
+            },
+            error: (error: any) => {
+              setError(`Failed to join meeting: ${error.message || error}`);
+            },
+          });
+
+          // Start meeting
+          ZoomMtg.startMeeting({
+            meetingNumber: zoomConfig.meetingNumber,
+            userName: zoomConfig.userName,
+            userEmail: zoomConfig.userEmail,
+            passWord: zoomConfig.passWord,
+            success: () => {
+              addLog({
+                slotId,
+                timestamp: new Date().toISOString(),
+                event: 'admin_action',
+                details: 'Zoom meeting started successfully',
+              });
+            },
+            error: (error: any) => {
+              setError(`Failed to start meeting: ${error.message || error}`);
+            },
+          });
+        };
+
+        script.onerror = () => {
+          setError('Failed to load Zoom SDK script');
+        };
+
+        document.head.appendChild(script);
+
+        return () => {
+          // Cleanup script
+          if (document.head.contains(script)) {
+            document.head.removeChild(script);
+          }
+        };
 
       } catch (error) {
-        setError(`Failed to load Zoom SDK: ${error}`);
+        setError(`Failed to initialize Zoom: ${error}`);
       }
     };
 
-    initializeZoom();
+    const cleanup = initializeZoom();
 
     return () => {
       // Cleanup Zoom session
@@ -114,6 +140,13 @@ export const ZoomWrapper: React.FC<ZoomWrapperProps> = ({
               details: 'Left Zoom meeting',
             });
           },
+        });
+      }
+      
+      // Run cleanup function if it exists
+      if (cleanup && typeof cleanup.then === 'function') {
+        cleanup.then((cleanupFn) => {
+          if (cleanupFn) cleanupFn();
         });
       }
     };

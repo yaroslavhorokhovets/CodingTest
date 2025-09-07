@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { EverWebinarWrapper } from './EverWebinarWrapper';
 import { ZoomWrapper } from './ZoomWrapper';
+import { CountdownTimer } from './CountdownTimer';
 import { useWebinarStore } from '@/lib/store';
 import { WebinarSlot, ZoomConfig } from '@/types/webinar';
 
@@ -140,6 +141,22 @@ export const WebinarPlayer: React.FC<WebinarPlayerProps> = ({ slot }) => {
           </span>
         </div>
       </div>
+
+      {/* Countdown Timer - Only show when in replay mode */}
+      {currentMode === 'replay' && (
+        <div className="absolute top-4 right-4 mt-16 bg-black bg-opacity-75 text-white px-4 py-3 rounded-lg border border-gray-600">
+          <div className="text-center">
+            <div className="text-xs text-gray-300 mb-1">Live Session Starts In:</div>
+            <CountdownTimer 
+              targetTime={new Date(slot.scheduledSwitchTime)}
+              onTimeReached={() => {
+                // This will be handled by the scheduled transition logic
+                console.log('Countdown reached - switching to live mode');
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
