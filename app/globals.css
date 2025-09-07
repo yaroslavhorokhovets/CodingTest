@@ -71,3 +71,36 @@ body {
     opacity: 0.5;
   }
 }
+
+.mock-everwebinar {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mock-everwebinar .aspect-video {
+  aspect-ratio: 16 / 9;
+}
+
+.mock-everwebinar button {
+  transition: all 0.2s ease-in-out;
+}
+
+.mock-everwebinar button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.mock-everwebinar .animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

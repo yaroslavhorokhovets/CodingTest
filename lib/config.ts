@@ -4,6 +4,8 @@ export const config = {
     name: 'Webinar Wrapper System',
     version: '1.0.0',
     url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    useMockEverWebinar: process.env.NEXT_PUBLIC_USE_MOCK_EVERWEBINAR === 'true',
+    debugMode: process.env.NEXT_PUBLIC_DEBUG_MODE === 'true',
   },
 
   // Default webinar settings
