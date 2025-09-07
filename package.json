@@ -25,7 +25,7 @@
     "zustand": "^4.4.0",
     "socket.io-client": "^4.7.0",
     "socket.io": "^4.7.0",
-    "@zoom/videosdk": "^2.0.0"
+    "@zoom/videosdk": "5.2.42037.1112"
   },
   "devDependencies": {
     "eslint": "^8.51.0",

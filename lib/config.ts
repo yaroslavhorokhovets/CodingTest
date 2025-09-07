@@ -18,7 +18,7 @@ export const config = {
 
   // Zoom settings
   zoom: {
-    sdkUrl: 'https://source.zoom.us/2.0.0/lib',
+    sdkUrl: 'https://source.zoom.us/5.2.42037.1112/lib',
     avPath: '/av',
     role: {
       attendee: 0,

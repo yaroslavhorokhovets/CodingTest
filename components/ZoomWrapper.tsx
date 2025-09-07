@@ -10,7 +10,7 @@ interface ZoomWrapperProps {
   onAttendeeCountChange?: (count: number) => void;
 }
 
-// Declare global ZoomMtg interface
+// Declare global ZoomMtg interface for SDK v5.2.42037.1112
 declare global {
   interface Window {
     ZoomMtg: {
@@ -22,6 +22,14 @@ declare global {
       join: (config: any) => void;
       startMeeting: (config: any) => void;
       leaveMeeting: (config: any) => void;
+      getAttendeeslist: () => any[];
+      muteAll: () => void;
+      mute: (userId: string) => void;
+      unmute: (userId: string) => void;
+      muteAllAudio: () => void;
+      muteAllVideo: () => void;
+      getCurrentUser: () => any;
+      getMeetingInfo: () => any;
     };
   }
 }
@@ -48,7 +56,7 @@ export const ZoomWrapper: React.FC<ZoomWrapperProps> = ({
 
         // Load Zoom Web SDK script dynamically
         const script = document.createElement('script');
-        script.src = 'https://source.zoom.us/2.0.0/lib/av/zoom-meeting-2.0.0.min.js';
+        script.src = 'https://source.zoom.us/5.2.42037.1112/lib/av/zoom-meeting-5.2.42037.1112.min.js';
         script.async = true;
         
         script.onload = () => {
@@ -83,7 +91,7 @@ export const ZoomWrapper: React.FC<ZoomWrapperProps> = ({
         }
 
         // Configure Zoom SDK
-        ZoomMtg.setZoomJSLib('https://source.zoom.us/2.0.0/lib', '/av');
+        ZoomMtg.setZoomJSLib('https://source.zoom.us/5.2.42037.1112/lib', '/av');
         ZoomMtg.preLoadWasm();
         ZoomMtg.prepareWebSDK();
         ZoomMtg.prepareJssdk();
