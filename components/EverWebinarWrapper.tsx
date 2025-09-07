@@ -18,17 +18,18 @@ export const EverWebinarWrapper: React.FC<EverWebinarWrapperProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const { addLog } = useWebinarStore();
 
+  const handleLoad = () => {
+    setIsLoaded(true);
+    addLog({
+      slotId,
+      timestamp: new Date().toISOString(),
+      event: 'attendee_joined',
+      details: 'EverWebinar session loaded',
+      attendeeCount: 1,
+    });
+  };
+
   useEffect(() => {
-    const handleLoad = () => {
-      setIsLoaded(true);
-      addLog({
-        slotId,
-        timestamp: new Date().toISOString(),
-        event: 'attendee_joined',
-        details: 'EverWebinar session loaded',
-        attendeeCount: 1,
-      });
-    };
 
     const handleMessage = (event: MessageEvent) => {
       // Handle messages from EverWebinar iframe
