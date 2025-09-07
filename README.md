@@ -172,6 +172,8 @@ Ensure all production environment variables are set:
 2. **Firebase Connection**: Check Firebase configuration and security rules
 3. **EverWebinar Embed**: Verify iframe permissions and CORS settings
 4. **Real-time Updates**: Check Firebase connection and network issues
+5. **DNS Resolution Errors**: Demo URLs automatically fall back to mock mode
+6. **Mock Mode**: Enable `NEXT_PUBLIC_USE_MOCK_EVERWEBINAR=true` for development
 
 ### Debug Mode
 

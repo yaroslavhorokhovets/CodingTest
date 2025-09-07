@@ -3,6 +3,9 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
+  // Suppress hydration warnings for client-side only attributes
+  reactStrictMode: true,
+  swcMinify: true,
   async headers() {
     return [
       {

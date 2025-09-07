@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useWebinarStore } from '@/lib/store';
+import { MockEverWebinar } from './MockEverWebinar';
+import { config } from '@/lib/config';
 
 interface EverWebinarWrapperProps {
   slotId: string;
@@ -16,19 +18,58 @@ export const EverWebinarWrapper: React.FC<EverWebinarWrapperProps> = ({
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const { addLog } = useWebinarStore();
 
+  const handleLoad = () => {
+    setIsLoaded(true);
+    addLog({
+      slotId,
+      timestamp: new Date().toISOString(),
+      event: 'attendee_joined',
+      details: 'EverWebinar session loaded',
+      attendeeCount: 1,
+    });
+  };
+
+  const handleError = () => {
+    setHasError(true);
+    addLog({
+      slotId,
+      timestamp: new Date().toISOString(),
+      event: 'error',
+      details: 'Failed to load EverWebinar session, using mock',
+    });
+  };
+
+  const handleCtaClick = (ctaName: string) => {
+    addLog({
+      slotId,
+      timestamp: new Date().toISOString(),
+      event: 'cta_clicked',
+      details: `CTA clicked: ${ctaName}`,
+    });
+  };
+
+  // Check if URL is a demo/placeholder URL
+  const isDemoUrl = everwebinarUrl.includes('demo.everwebinar.com') || 
+                   everwebinarUrl.includes('localhost') ||
+                   everwebinarUrl.includes('example.com');
+
+  // Use mock component for demo URLs, when there's an error, or when mock mode is enabled
+  if (config.app.useMockEverWebinar || isDemoUrl || hasError) {
+    return (
+      <div className="webinar-container">
+        <MockEverWebinar
+          slotId={slotId}
+          onAttendeeCountChange={onAttendeeCountChange}
+          onCtaClick={handleCtaClick}
+        />
+      </div>
+    );
+  }
+
   useEffect(() => {
-    const handleLoad = () => {
-      setIsLoaded(true);
-      addLog({
-        slotId,
-        timestamp: new Date().toISOString(),
-        event: 'attendee_joined',
-        details: 'EverWebinar session loaded',
-        attendeeCount: 1,
-      });
-    };
 
     const handleMessage = (event: MessageEvent) => {
       // Handle messages from EverWebinar iframe
@@ -71,6 +112,7 @@ export const EverWebinarWrapper: React.FC<EverWebinarWrapperProps> = ({
         allow="autoplay; fullscreen; microphone; camera"
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
         onLoad={handleLoad}
+        onError={handleError}
       />
       {!isLoaded && (
         <div className="flex items-center justify-center h-full">
