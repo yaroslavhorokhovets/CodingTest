@@ -144,14 +144,17 @@ export const WebinarPlayer: React.FC<WebinarPlayerProps> = ({ slot }) => {
 
       {/* Countdown Timer - Only show when in replay mode */}
       {currentMode === 'replay' && (
-        <div className="absolute top-4 right-4 mt-16 bg-black bg-opacity-50 text-white px-3 py-2 rounded-lg">
-          <CountdownTimer 
-            targetTime={new Date(slot.scheduledSwitchTime)}
-            onTimeReached={() => {
-              // This will be handled by the scheduled transition logic
-              console.log('Countdown reached - switching to live mode');
-            }}
-          />
+        <div className="absolute top-4 right-4 mt-16 bg-black bg-opacity-75 text-white px-4 py-3 rounded-lg border border-gray-600">
+          <div className="text-center">
+            <div className="text-xs text-gray-300 mb-1">Live Session Starts In:</div>
+            <CountdownTimer 
+              targetTime={new Date(slot.scheduledSwitchTime)}
+              onTimeReached={() => {
+                // This will be handled by the scheduled transition logic
+                console.log('Countdown reached - switching to live mode');
+              }}
+            />
+          </div>
         </div>
       )}
     </div>

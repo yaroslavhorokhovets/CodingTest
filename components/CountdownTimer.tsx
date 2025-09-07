@@ -54,7 +54,6 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   return (
     <div className={`countdown-timer ${className}`}>
       <div className="flex items-center space-x-1">
-        <div className="text-xs text-gray-300 mr-2">Live in:</div>
         {isTimeUp ? (
           <div className="text-sm font-bold text-success-500">NOW!</div>
         ) : (
